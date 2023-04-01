@@ -75,11 +75,13 @@ def creer_joueur(nom):
 def shuffle(joueurs):                                       
 #cette fonction écrit les positions aléatoires des bateaux d'un joueur
 
-    for _ in range (5):                                         #chaque joueur a 5 bateaux
-        ligne = int(6*random.random()) + 1                      #la position aleatoire d'un bateau
+    while len(joueurs["bateaux"]) < 5:                                         #chaque joueur a 5 bateaux
+        ligne = int(6*random.random()) + 1                                     #la position aleatoire d'un bateau
         colonne = int(6*random.random())
         position = lettres_collones[colonne] + str(ligne)
-        joueurs["bateaux"].append(position)
+
+        if position not in joueurs["bateaux"]:                                  #on veut s'assurer que tous les bateaux sont distincts
+            joueurs["bateaux"].append(position)
 
 
 def gagnant (joueurs):
@@ -99,9 +101,19 @@ def gagnant (joueurs):
 
 
 def get_coordinates(cible):                     #cette fontion retourne les coordonées d'une cible proposé
-    letter = cible[0];letter.capitalize()
-    number = int(cible[1])
+    letter = cible[0]
+
+    while True:
+        try:
+            number = int(cible[1])
+            break
+        except ValueError:
+            return
+
     position = 0
+
+    if letter not in lettres_collones or number > 6:
+        return
 
     for letters in lettres_collones:
         if letter == letters:
@@ -222,11 +234,13 @@ def jouer():
     cols = 6
     lignes = 6
 
-    distance = 20               #la distance entre la ligne bleu et une grille
+    distance = 20                                          #la distance entre la ligne bleu et une grille
     largueur = 10
 
-    taille = 16                 #la taille d'un carré
-    espace = 4                  #l'espace entre deux carrés
+    taille = 16                                             #la taille d'un carré
+    espace = 4                                              #l'espace entre deux carrés
+
+    cont = True
 
     for i in range(nombre_joueurs):                          #on creait les joueurs du jexu avec leurs bateaux
         joueurs.append(creer_joueur(f"Joueur {i + 1}"))
@@ -236,7 +250,8 @@ def jouer():
 
     dessins(taille, espace, cols, lignes, largueur, distance)
 
-    for chanches in range(3):                                #chaque joueurs à droit à 7 chances
+    while cont:
+
         for joueur in range(nombre_joueurs): 
 
             if joueur == 1: 
@@ -250,32 +265,42 @@ def jouer():
 
             print('Joueur',joueur+1)
 
-            proposition = input('Visez un bateau adverse: ')
-            cible = get_coordinates(proposition)
+            while True:
+                proposition = input('Visez un bateau adverse: ')
+                proposition = proposition.upper()
+                cible = get_coordinates(proposition)
+                if cible != None: break
 
             if cible in joueurs[joueur]["trouves"]:
                 print('Vous avez déjà touché ce bateau'); print("")
             
-            elif proposition in joueurs[autre]["bateaux"]:              #si la cible proposé est parmi les bateaux de l'autre joueur
+            elif proposition in joueurs[autre]["bateaux"]:                  #si la cible proposée est parmi les bateaux de l'autre joueur
 
                 print("Touché!"); print("")
-                joueurs[joueur]["trouves"].append(cible)        #les bateaux adverse touchés
-                joueurs[joueur]["points"] += 1                  #on donne les points du joeuur actuel
+                joueurs[joueur]["trouves"].append(cible)                    #les bateaux adverse touchés
+                joueurs[joueur]["points"] += 1                              #on donne les points du joeuur actuel
 
-                prochaine_partie_touche(joueurs[joueur], taille, espace, cols) 
+                prochaine_partie_touche(joueurs[joueur], taille, espace, cols)                                            
 
             else:
                 joueurs[joueur]["rates"].append(cible)
-                print('Raté'); print("")
+                print('Raté!'); print("")
                 prochaine_partie_rate(joueurs[joueur], taille, espace, cols)
+
+            nombre_touches_0 = joueurs[0]["trouves"]
+            nombre_touches_1 = joueurs[1]["trouves"]
+
+            if len(nombre_touches_0) == 5 or len(nombre_touches_1) == 5:                #si un joueur a trouvé tous les bateaux de l'autre, on s'arrete
+                cont = False
+                break
 
     meilleur = gagnant(joueurs)
     meilleur_jouer = meilleur[0]
     meilleur_point = meilleur[1]
 
-    print('Le meilleur joueur est',meilleur_jouer,'avec',meilleur_point,'points')
+    print('Le meilleur joueur est',meilleur_jouer,'avec',meilleur_point,'points'); print("")
 
-    print('Clickez n\'importe où pour teminer')
+    print('Clickez n\'importe où pour terminer')
     turtle.exitonclick()
 
 
