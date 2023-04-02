@@ -11,7 +11,7 @@ from turtle import *
 import math  
 import random        
 
-lettres_collones = ['A', 'B', 'C', 'D', 'E', 'F']                           #la liste de toutes les lettres qui représentent les colonnes
+lettres_colonnes = ['A', 'B', 'C', 'D', 'E', 'F']                           #la liste de toutes les lettres qui représentent les colonnes
 
 def arc(r, angle):
 #Cette fonction permet de tracer un arc de cercle
@@ -30,8 +30,10 @@ def cercle(r):
 #Cette fonction permet de dessiner un cercle rouge qui représente un bateau
 
     turtle.color("red")
+    turtle.pensize("4")
     arc(r, 360)
     turtle.color("black")
+    turtle.pensize("1")
 
 
 def carre(cote):
@@ -70,7 +72,7 @@ def shuffle(joueur, cols):
     while len(joueur["bateaux"]) < cols-1:                                        #chaque joueur a 5 bateaux
         ligne = int(cols*random.random()) + 1                                     #la position aleatoire d'un bateau
         colonne = int(cols*random.random())
-        position = lettres_collones[colonne] + str(ligne)
+        position = lettres_colonnes[colonne] + str(ligne)
 
         if position not in joueur["bateaux"]:                                     #on veut s'assurer que tous les bateaux sont distincts
             joueur["bateaux"].append(position)
@@ -96,15 +98,21 @@ def gagnant (joueurs):
 def get_coordinates(cible ,cols):
 #cette fontion retourne les coordonées d'une cible proposé
 
+    if len(cible) != 2: return                                                    #on s'assure que la cible proposée contient bien deux caractères
+
     letter = cible[0]
-    number = int(cible[1]) - 1
+
+    try:                                                                          #on veut s'assurer que le deuxième caractère est bien un entier
+        number = int(cible[1]) - 1
+    except ValueError:
+        return
 
     colonne = 0
 
-    if letter not in lettres_collones or number > 5 or number < 0:                #on veut s'assurer que les entrées de l'utilisateur correspondent 
+    if letter not in lettres_colonnes or number > 5 or number < 0:                #on veut s'assurer que les entrées de l'utilisateur correspondent 
         return                                                                    #aux cases du jeux, sinon on retoune demander une nouvelle entrée
 
-    for letters in lettres_collones:                                              #on parcourure les lettres des colonnes pour identifier la position
+    for letters in lettres_colonnes:                                              #on parcourure les lettres des colonnes pour identifier la position
                                                                                   #de la la lettre dès qu'on la trouve
         if letter == letters: break                             
 
@@ -143,7 +151,6 @@ def grille (joueur, cols, lignes, taille, espace):
     for x in range(cols):
         for y in range(lignes):
             coordinate = [y, x]
-
 
             if coordinate in joueur["rates"]:                                     #pour dessiner toutes les cases ratées
                 positionner(x * (taille + espace), y * (taille + espace))  
@@ -201,24 +208,24 @@ def jouer():
 #cette fonction est la fonction principale du jeux qui initialise la partie et procède à l'appel d'autres fontions
 
     nombre_joueurs = 2
-    joueurs = []                                            #la liste des joueurs du jeux
-    cols = 6
+    joueurs = []                                             #la liste des joueurs du jeux
+    cols = 6                                                 #le nombre de colonnes pour une grille du jeux
     lignes = 6
 
-    distance = 20                                           #la distance entre la ligne bleu et une grille
-    largueur = 10                                           #la largueur de la ligne séparatrice
+    distance = 20                                            #la distance entre la ligne bleu et une grille
+    largueur = 10                                            #la largueur de la ligne séparatrice
 
-    taille = 16                                             #la taille d'un carré
-    espace = 4                                              #l'espace entre deux carrés
+    taille = 16                                              #la taille d'un carré
+    espace = 4                                               #l'espace entre deux carrés
 
-    cont = True                                             #la decision de continuer le jeux ou pas
+    cont = True                                              #la decision de continuer le jeux ou pas
 
     for i in range(nombre_joueurs):                          #on creait les joueurs du jexu avec leurs bateaux
         joueurs.append(creer_joueur(f"Joueur {i + 1}"))
 
         shuffle(joueurs[i], cols)
 
-    #turtle.shape("arrow")                                   #si on veut changer le type de figure de la tortue
+    turtle.shape("arrow")                                   #si on veut changer le type de figure de la tortue
     #turtle.hideturtle()                                     #si on decide de cacher la tortue
     dessins(joueurs, taille, espace, cols, lignes, largueur, distance)
 
@@ -242,17 +249,17 @@ def jouer():
                 proposition = input('Visez un bateau adverse: ')
                 proposition = proposition.upper().strip()
 
-                cible = get_coordinates(proposition, cols)                  #si un joueur entre une cible non valid, le programme lui demandera
-                if cible != None: break                                     #d'entrer une cible à nouveau
+                cible = get_coordinates(proposition, cols)                             #si un joueur entre une cible non valide ou vide, le
+                if cible != None: break                                                #programme lui demandera d'entrer une cible à nouveau
 
             if cible in joueurs[autre]["trouves"]:
                 print('Vous avez déjà touché ce bateau'); print("")
             
-            elif proposition in joueurs[autre]["bateaux"]:                  #si la cible proposée est parmi les bateaux de l'autre joueur
+            elif proposition in joueurs[autre]["bateaux"]:                             #si la cible proposée est parmi les bateaux de l'autre joueur
 
                 print("Touché!"); print("")
-                joueurs[autre]["trouves"].append(cible)                     #les bateaux touchés par l'adversaire
-                joueurs[joueur]["points"] += 1                              #on donne les points du joueur actuel                                           
+                joueurs[autre]["trouves"].append(cible)                                #les bateaux touchés par l'adversaire
+                joueurs[joueur]["points"] += 1                                         #on donne les points du joueur actuel                                           
 
             else:
                 joueurs[autre]["rates"].append(cible)
