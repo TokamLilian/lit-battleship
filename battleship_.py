@@ -98,19 +98,19 @@ def gagnant (joueurs):
 def get_coordinates(cible ,cols):
 #cette fontion retourne les coordonées d'une cible proposé
 
-    if len(cible) != 2: return                                                    #on s'assure que la cible proposée contient bien deux caractères
+    if len(cible) != 2: return None                                               #on s'assure que la cible proposée contient bien deux caractères
 
     letter = cible[0]
 
     try:                                                                          #on veut s'assurer que le deuxième caractère est bien un entier
         number = int(cible[1]) - 1
     except ValueError:
-        return
+        return None
 
     colonne = 0
 
     if letter not in lettres_colonnes or number > 5 or number < 0:                #on veut s'assurer que les entrées de l'utilisateur correspondent 
-        return                                                                    #aux cases du jeux, sinon on retoune demander une nouvelle entrée
+        return None                                                               #aux cases du jeux, sinon on retoune demander une nouvelle entrée
 
     for letters in lettres_colonnes:                                              #on parcourure les lettres des colonnes pour identifier la position
                                                                                   #de la la lettre dès qu'on la trouve
@@ -206,7 +206,7 @@ def dessins(joueurs, taille, espace, cols, lignes, largueur, distance):
 
 def jouer():
 #cette fonction est la fonction principale du jeux qui initialise la partie et procède à l'appel d'autres fontions
-
+    turtle.delay(0)
     nombre_joueurs = 2
     joueurs = []                                             #la liste des joueurs du jeux
     cols = 6                                                 #le nombre de colonnes pour une grille du jeux
